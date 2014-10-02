@@ -84,7 +84,7 @@ plt_ntr <- function(df, Labels, ylabs) {
                       labels = c("Ambient", expression(eCO[2]))) +
     scale_linetype_manual(values = c("solid", "dashed"), 
                           labels = c("Ambient", expression(eCO[2]))) +
-    facet_wrap(~type, scales = "free_y", ncol = 2) +
+    facet_wrap(~type, scales = "free", ncol = 2) +
     geom_blank(aes(x = date, y = yval), data = blankDF) +
     science_theme
   pl <- facet_wrap_labeller(p2, labels = Labels)

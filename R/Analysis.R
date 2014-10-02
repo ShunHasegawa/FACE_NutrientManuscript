@@ -70,10 +70,11 @@ theme_set(theme_bw())
 
 science_theme <- theme(panel.grid.major = element_blank(),
                        panel.grid.minor = element_blank(),
-                       axis.text.x  = element_text(angle=45, vjust= 1, hjust = 1),
+                       axis.text.x  = element_text(angle=45, vjust= 1, hjust = 1, size = 7),
                        legend.position = c(.9, .93),
                        legend.title = element_blank(),
                        legend.background = element_blank())
+pl()
 
 # modify labels
 ylabs_lst <- list('no' = c(expression(A.~~KCl*-extractable~(mg~kg^"-1")),
@@ -97,8 +98,11 @@ ylabs_lst <- list('no' = c(expression(A.~~KCl*-extractable~(mg~kg^"-1")),
 
 figtitles <- c("Nitrate", "Ammonium", "Phosphate")
 
+
+pl <- function(){
 l_ply(1:3, function(x) 
   ggsavePP(filename = paste("Output//Fig/FACE_Manuscript_", figtitles[x], sep = ""),
            plot = plt_ntr(df = ntr_lst[[x]], Labels = ylabs_lst[[x]], ylabs = figtitles[x]),
-           width = 7, height = 7)
+           width = 7, height = 8)
   )
+}
