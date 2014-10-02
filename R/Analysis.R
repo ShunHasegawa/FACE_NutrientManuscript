@@ -51,21 +51,61 @@ ntrDF <- rbind.fill(list(ext, iem, lys, mine))
 # test #
 ########
 df <- subset(ntrDF, variable == "no")
-df$type <- factor(df$type, levels = c("KCl-extractable", "Soil solution-Shallow",
-                                      "Nitrification", "IEM-adsorbed", 
-                                      "Soil solution-Deep", "N mineralisation"))
+df$type <- factor(df$type, levels = c("KCl-extractable", "IEM-adsorbed",
+                                      "Soil solution-Shallow", "Soil solution-Deep", 
+                                      "Nitrification", "N mineralisation"))
 
 science_theme <- theme(panel.grid.major = element_blank(),
                        panel.grid.minor = element_blank(),
                        axis.text.x  = element_text(angle=45, vjust= 1, hjust = 1),
-                       legend.position = "top",
+                       legend.position = c(.9, .9),
                        legend.title = element_blank())
+
+
+
+## Blank data frame ## I woudl like to use the same y range for soil solution
+#and for nitrificaiton and N mineralisation. Create dataframe to define y range
+#for each plot. This data frame actually doesn't plot anything but enable one to
+#define y range (or x range if one likes)
+
+df$metric <- factor(ifelse(df$type %in% c("Soil solution-Shallow", "Soil solution-Deep"),
+                           "SoilSol", 
+                           ifelse(df$type %in% c("Nitrification", "N mineralisation"), 
+                                  "mine", as.character(df$type))))
+
+# range of soil solution
+SSrng <- with(subsetD(df, type %in% c("Soil solution-Shallow", "Soil solution-Deep")), 
+             c(min(Mean - SE, na.rm = TRUE), max(Mean + SE, na.rm = TRUE)))
+
+unique(df$type)
+
+
+ddply(subsetD(df, .(type),
+      .(type), summarise, yval = median(Mean))
+
+
+blankDF <- data.frame(date = df$date[1], 
+                      ,
+                      
+                        
+                        
+                        
+                        c(rep(SSrng[1], 3), 0,
+                               rep(SSrng[2], 3), 0),
+                      co2 = "amb")
+
+
+
+
+pl <- plf()
+ggsavePP(filename = "Output//Fig/test", plot = pl, width = 7, height = 7)
 
 
 theme_set(theme_bw())
 
 
-p <- ggplot(df, aes(x = date, y = Mean, group = co2))
+plf <- function()
+{p <- ggplot(df, aes(x = date, y = Mean, group = co2))
 
 p2 <- p + geom_line(aes(linetype = co2)) + 
   geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
@@ -87,14 +127,17 @@ p2 <- p + geom_line(aes(linetype = co2)) +
   science_theme
 
 # modify labels
-ylabs <- c(expression(textstyle(atop("KCl extractable", paste((mg~kg^"-1"))))),
-           expression(textstyle(atop("Soil solution (Shallow)", (mg~l^"-1")))),
-           expression(textstyle(atop("Net nitrification rate", (mg~kg^"-1"~d^"-1")))),
-           expression(textstyle(atop("IEM adsorbed", (ng~cm^"-1"~d^"-1")))),
-           expression(textstyle(atop("Soil solution (Deep)", (mg~l^"-1")))),
-           expression(textstyle(atop("Net N mineralisation rate", (mg~kg^"-1"~d^"-1")))))
+ylabs <- c(expression(KCl*-extractable~(mg~kg^"-1")),
+           expression(IEM*-adsorbed~(ng~cm^"-1"~d^"-1")),
+           expression(Soil~solution~(Shallow)~(mg~l^"-1")),
+           expression(Soil~solution~(Deep)~(mg~l^"-1")),
+           expression(Net~nitrification~(mg~kg^"-1"~d^"-1")),
+           expression(Net~N~mineralisation~(mg~kg^"-1"~d^"-1")))
 
 pl <- facet_wrap_labeller(p2, labels = ylabs)
+return(pl)
+}
+
 ggsavePP(filename = "Output//Fig/test", plot = pl, width = 7, height = 7)
 
   
